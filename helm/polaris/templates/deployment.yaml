@@ -39,10 +39,11 @@ spec:
       {{- include "polaris.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- if .Values.podAnnotations }}
       annotations:
-        {{- tpl (toYaml .Values.podAnnotations) . | nindent 8 }}
-      {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.podAnnotations }}
+          {{ tpl (toYaml .Values.podAnnotations) . | nindent 8 }}
+        {{- end }}
       labels:
         {{- include "polaris.selectorLabels" . | nindent 8 }}
         {{- if .Values.podLabels }}
@@ -134,7 +135,7 @@ spec:
             claimName: {{ include "polaris.fullnameWithSuffix" (list . "logs") }}
         {{- end }}
         - name: temp-dir
-          emptyDir: {}
+          emptyDir: { }
         {{- if .Values.extraVolumes }}
         {{- tpl (toYaml .Values.extraVolumes) . | nindent 8 }}
         {{- end }}
